@@ -1,18 +1,29 @@
 - name: install zabbix-agent repository on centos7
   shell: rpm -i https://repo.zabbix.com/zabbix/4.0/rhel/7/x86_64/zabbix-release-4.0-1.el7.noarch.rpm
   when: ansible_distribution == 'CentOS' and ansible_distribution_major_version|int ==7
+
 - name: install zabbix-agent repository on centos6
   shell: rpm -i https://repo.zabbix.com/zabbix/4.0/rhel/6/x86_64/zabbix-release-4.0-1.el6.noarch.rpm
   when: ansible_distribution == 'CentOS' and ansible_distribution_major_version|int ==6
+
 - name: install zabbix-agent on centos
   yum: name=zabbix-agent
   when: ansible_distribution == 'CentOS'
+
 - name: install zabbix-agent on ubuntu
   apt: name=zabbix-agent
   when: ansible_distribution == 'Ubuntu'
-- name: setup zabbix-agent conf
-  template: src=zabbix_agentd.conf dest=/etc/zabbix/zabbix_agentd.conf
+
+- name: setup zabbix-agent conf on centos
+  template: src=zabbix_agentd_centos.conf dest=/etc/zabbix/zabbix_agentd.conf
+  when: ansible_distribution == 'CentOS'
+
+- name: setup zabbix-agent conf on ubuntu
+  template: src=zabbix_agentd_ubuntu.conf dest=/etc/zabbix/zabbix_agentd.conf
+  when: ansible_distribution == 'Ubuntu'
+
 - name: add service when power on
   shell: systemctl enable zabbix-agent
+  
 - name: restart zabbix-agent
   service: name=zabbix-agent state=restarted
